@@ -83,6 +83,7 @@ enum class KeyboardBinding(
     Diplomacy(Category.WorldScreen, KeyCharAndCode.UNKNOWN),
     Espionage(Category.WorldScreen, KeyCharAndCode.UNKNOWN),
     Undo(Category.WorldScreen, KeyCharAndCode.ctrl('z')),
+    Notes(Category.WorldScreen, KeyCharAndCode.ctrl('t')),
     ToggleUI(Category.WorldScreen, "Toggle UI", KeyCharAndCode.ctrl('u')),
     ToggleWorkedTilesDisplay(Category.WorldScreen, KeyCharAndCode.UNKNOWN),
     ToggleMovementDisplay(Category.WorldScreen, KeyCharAndCode.UNKNOWN),

@@ -18,6 +18,7 @@ import com.unciv.ui.components.fonts.Fonts
 import com.unciv.ui.components.input.KeyboardBinding
 import com.unciv.ui.components.input.onActivation
 import com.unciv.ui.images.ImageGetter
+import com.unciv.ui.popups.Popup
 import com.unciv.ui.screens.basescreen.BaseScreen
 import com.unciv.ui.screens.diplomacyscreen.DiplomacyScreen
 import com.unciv.ui.screens.overviewscreen.EspionageOverviewScreen
@@ -26,6 +27,7 @@ import com.unciv.ui.screens.pickerscreens.TechButton
 import com.unciv.ui.screens.pickerscreens.TechPickerScreen
 import com.unciv.ui.screens.worldscreen.UndoHandler.Companion.canUndo
 import com.unciv.ui.screens.worldscreen.UndoHandler.Companion.restoreUndoCheckpoint
+import com.unciv.utils.launchOnGLThread
 
 
 /** A holder for Tech, Policies and Diplomacy buttons going in the top left of the WorldScreen just under WorldScreenTopBar */
@@ -43,6 +45,8 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
     private val diplomacyButton = Button(skin)
     private val undoButtonHolder = Container<Button?>()
     private val undoButton = Button(skin)
+    private val notesButtonHolder = Container<Button?>()
+    private val notesButton = Button(skin)
     private val espionageButtonHolder = Container<Button?>()
     private val espionageButton = Button(skin)
 
@@ -56,6 +60,7 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         add(policyButtonHolder).padTop(10f).padRight(10f)
         add(diplomacyButtonHolder).padTop(10f).padRight(10f)
         add(espionageButtonHolder).padTop(10f).padRight(10f)
+        add(notesButtonHolder).padTop(10f).padRight(10f)
         add(undoButtonHolder).padTop(10f).padRight(10f)
         add().growX()  // Allows Policy and Diplo buttons to keep to the left
 
@@ -77,6 +82,11 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         undoButton.add(ImageGetter.getImage("OtherIcons/Undo")).size(30f).pad(15f)
         undoButton.onActivation(binding = KeyboardBinding.Undo) {
             handleUndo()
+        }
+
+        notesButton.add(ImageGetter.getImage("OtherIcons/Pencil")).size(30f).pad(15f)
+        notesButton.onActivation(binding = KeyboardBinding.Notes) {
+            handleNotes()
         }
 
         policyScreenButton.add(ImageGetter.getImage("OtherIcons/Policies")).size(30f).pad(15f)
@@ -106,6 +116,7 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         updateFogOfWarButton()
         updateTechButton()
         updateUndoButton()
+        updateNotesButton()
         updatePolicyButton()
         val result = updateDiplomacyButton()
         if (game.gameInfo!!.isEspionageEnabled())
@@ -171,6 +182,11 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
         }
     }
 
+    private fun updateNotesButton() {
+        notesButton.touchable = Touchable.enabled
+        notesButtonHolder.actor = notesButton
+    }
+
     private fun updateDiplomacyButton(): Boolean {
         return if (viewingCiv.isDefeated() || viewingCiv.isSpectator()
                 || viewingCiv.getKnownCivs().filterNot { it == viewingCiv || it.isBarbarian }.none()
@@ -198,6 +214,10 @@ class TechPolicyDiplomacyButtons(val worldScreen: WorldScreen) : Table(BaseScree
     private fun handleUndo() {
         undoButton.disable()
         worldScreen.restoreUndoCheckpoint()
+    }
+
+    private fun handleNotes() {
+        NotesPopup(worldScreen).open()
     }
 
     override fun act(delta: Float) = super.act(delta)
